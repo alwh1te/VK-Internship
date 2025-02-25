@@ -148,8 +148,8 @@ private extension ReviewCell {
         NSLayoutConstraint.activate([
             userImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             userImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            userImageView.widthAnchor.constraint(equalToConstant: 40),
-            userImageView.heightAnchor.constraint(equalToConstant: 40),
+            userImageView.widthAnchor.constraint(equalToConstant: ReviewCellLayout.avatarSize.width),
+            userImageView.heightAnchor.constraint(equalToConstant: ReviewCellLayout.avatarSize.height),
             
             userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 12),
             userNameLabel.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
