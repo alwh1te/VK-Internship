@@ -9,10 +9,12 @@ struct ReviewCellConfig {
 
     /// Идентификатор конфигурации. Можно использовать для поиска конфигурации в массиве.
     let id = UUID()
-    
+    /// Имя пользователя, которое будет отображено.
     let userName: String
-    // TODO: comments
+    /// Ссылка на аватарку.
     let avatarURL: URL?
+    /// Рейтинг отзыва
+    let rating: Int
     /// Текст отзыва.
     let reviewText: NSAttributedString
     /// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -21,6 +23,10 @@ struct ReviewCellConfig {
     let created: NSAttributedString
     /// Замыкание, вызываемое при нажатии на кнопку "Показать полностью...".
     let onTapShowMore: (UUID) -> Void
+    /// Класс для рендеринга рейтинга.
+    let ratingRender: RatingRenderer
+    /// КЛасс для загрузки кешированных изображений.
+    let imageProvider: ImageProvider
 
     /// Объект, хранящий посчитанные фреймы для ячейки отзыва.
     fileprivate let layout = ReviewCellLayout()
@@ -41,11 +47,12 @@ extension ReviewCellConfig: TableCellConfig {
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
+        cell.ratingImageView.image = ratingRender.ratingImage(rating)
         cell.config = self
         
 
         if let url = avatarURL {
-            cell.avatarCancellable = ImageProvider.shared.loadImage(from: url)
+            cell.avatarCancellable = imageProvider.loadImage(from: url)
                 .sink { [weak cell] image in
                     cell?.userImageView.image = image ?? UIImage(named: "default_avatar")
                 }
@@ -91,6 +98,7 @@ final class ReviewCell: UITableViewCell {
 
     fileprivate let userImageView = UIImageView()
     fileprivate let userNameLabel = UILabel()
+    fileprivate let ratingImageView = UIImageView()
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
@@ -132,6 +140,7 @@ private extension ReviewCell {
         setupLayout()
         setupUserImageView()
         setupUserNameLabel()
+        setupRatingView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
@@ -140,6 +149,7 @@ private extension ReviewCell {
     func addSubviews() {
         contentView.addSubview(userImageView)
         contentView.addSubview(userNameLabel)
+        contentView.addSubview(ratingImageView)
         contentView.addSubview(reviewTextLabel)
         contentView.addSubview(createdLabel)
     }
@@ -155,8 +165,12 @@ private extension ReviewCell {
             userNameLabel.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
             userNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            reviewTextLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            reviewTextLabel.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 12),
+            ratingImageView.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor, constant: 0),
+            ratingImageView.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 4),
+            ratingImageView.trailingAnchor.constraint(equalTo: userNameLabel.trailingAnchor, constant: 0),
+            
+            reviewTextLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor, constant: 0),
+            reviewTextLabel.topAnchor.constraint(equalTo: ratingImageView.bottomAnchor, constant: 12),
             reviewTextLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             createdLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -176,6 +190,12 @@ private extension ReviewCell {
     func setupUserNameLabel() {
         userNameLabel.font = .systemFont(ofSize: 14, weight: .medium)
         userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func setupRatingView() {
+        ratingImageView.contentMode = .left
+        ratingImageView.clipsToBounds = true
+        ratingImageView.translatesAutoresizingMaskIntoConstraints = false
     }
 
     func setupReviewTextLabel() {
