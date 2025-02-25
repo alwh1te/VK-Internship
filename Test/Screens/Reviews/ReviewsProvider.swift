@@ -26,6 +26,7 @@ extension ReviewsProvider {
 
     func getReviews(offset: Int = 0, completion: @escaping (GetReviewsResult) -> Void) {
         guard let url = bundle.url(forResource: "getReviews.response", withExtension: "json") else {
+            print("❌ Failed to find JSON file")
             return completion(.failure(.badURL))
         }
 
@@ -34,8 +35,10 @@ extension ReviewsProvider {
 
         do {
             let data = try Data(contentsOf: url)
+            print("📄 Successfully loaded JSON data: \(String(data: data, encoding: .utf8) ?? "nil")")
             completion(.success(data))
         } catch {
+            print("❌ Failed to load JSON data: \(error)")
             completion(.failure(.badData(error)))
         }
     }

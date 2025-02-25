@@ -1,4 +1,5 @@
 import UIKit
+import Combine
 
 /// Конфигурация ячейки. Содержит данные для отображения в ячейке.
 struct ReviewCellConfig {
@@ -8,6 +9,10 @@ struct ReviewCellConfig {
 
     /// Идентификатор конфигурации. Можно использовать для поиска конфигурации в массиве.
     let id = UUID()
+    
+    let userName: String
+    // TODO: comments
+    let avatarURL: URL?
     /// Текст отзыва.
     let reviewText: NSAttributedString
     /// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -30,16 +35,38 @@ extension ReviewCellConfig: TableCellConfig {
     /// Вызывается из `cellForRowAt:` у `dataSource` таблицы.
     func update(cell: UITableViewCell) {
         guard let cell = cell as? ReviewCell else { return }
+        
+        cell.userNameLabel.text = userName
+
         cell.reviewTextLabel.attributedText = reviewText
         cell.reviewTextLabel.numberOfLines = maxLines
         cell.createdLabel.attributedText = created
         cell.config = self
+        
+
+        if let url = avatarURL {
+            cell.avatarCancellable = ImageProvider.shared.loadImage(from: url)
+                .sink { [weak cell] image in
+                    cell?.userImageView.image = image ?? UIImage(named: "default_avatar")
+                }
+        } else {
+            cell.userImageView.image = UIImage(named: "default_avatar")
+        }
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
     /// Вызывается из `heightForRowAt:` делегата таблицы.
     func height(with size: CGSize) -> CGFloat {
-        layout.height(config: self, maxWidth: size.width)
+        let minHeight: CGFloat = 88 // 16 + 40 + 16 + 16
+                
+        // Расчет высоты для текста отзыва
+        let textWidth = size.width - 32 // отступы слева и справа
+        let textHeight = reviewText.boundingRect(width: textWidth).height
+        
+        // Расчет высоты для даты
+        let createdHeight = created.boundingRect(width: textWidth).height
+        
+        return minHeight + textHeight + createdHeight + 20 // 20 для дополнительных отступов
     }
 
 }
@@ -60,6 +87,10 @@ final class ReviewCell: UITableViewCell {
 
     fileprivate var config: Config?
 
+    fileprivate var avatarCancellable: AnyCancellable?
+
+    fileprivate let userImageView = UIImageView()
+    fileprivate let userNameLabel = UILabel()
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
@@ -73,6 +104,15 @@ final class ReviewCell: UITableViewCell {
         setupCell()
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        avatarCancellable?.cancel()
+        userImageView.image = nil
+        userNameLabel.text = nil
+        reviewTextLabel.attributedText = nil
+        createdLabel.attributedText = nil
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         guard let layout = config?.layout else { return }
@@ -88,22 +128,67 @@ final class ReviewCell: UITableViewCell {
 private extension ReviewCell {
 
     func setupCell() {
+        addSubviews()
+        setupLayout()
+        setupUserImageView()
+        setupUserNameLabel()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
     }
+    
+    func addSubviews() {
+        contentView.addSubview(userImageView)
+        contentView.addSubview(userNameLabel)
+        contentView.addSubview(reviewTextLabel)
+        contentView.addSubview(createdLabel)
+    }
+    
+    func setupLayout() {
+        NSLayoutConstraint.activate([
+            userImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            userImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            userImageView.widthAnchor.constraint(equalToConstant: 40),
+            userImageView.heightAnchor.constraint(equalToConstant: 40),
+            
+            userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 12),
+            userNameLabel.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
+            userNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            reviewTextLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            reviewTextLabel.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 12),
+            reviewTextLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            createdLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            createdLabel.topAnchor.constraint(equalTo: reviewTextLabel.bottomAnchor, constant: 8),
+            createdLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            createdLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+        ])
+    }
+    
+    func setupUserImageView() {
+        userImageView.contentMode = .scaleAspectFill
+        userImageView.clipsToBounds = true
+        userImageView.layer.cornerRadius = ReviewCellLayout.avatarCornerRadius
+        userImageView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func setupUserNameLabel() {
+        userNameLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+    }
 
     func setupReviewTextLabel() {
-        contentView.addSubview(reviewTextLabel)
+        reviewTextLabel.numberOfLines = 0
+        reviewTextLabel.translatesAutoresizingMaskIntoConstraints = false
         reviewTextLabel.lineBreakMode = .byWordWrapping
     }
 
     func setupCreatedLabel() {
-        contentView.addSubview(createdLabel)
+        createdLabel.translatesAutoresizingMaskIntoConstraints = false
     }
 
     func setupShowMoreButton() {
-        contentView.addSubview(showMoreButton)
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
     }

@@ -48,11 +48,21 @@ private extension ReviewsViewModel {
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
         do {
             let data = try result.get()
+            print("📦 Got data: \(String(data: data, encoding: .utf8) ?? "nil")")
+            
             let reviews = try decoder.decode(Reviews.self, from: data)
-            state.items += reviews.items.map(makeReviewItem)
+            print("✅ Decoded reviews count: \(reviews.items.count)")
+            
+            let newItems = reviews.items.map(makeReviewItem)
+            print("🔄 Created items count: \(newItems.count)")
+            
+            state.items += newItems
+            print("📊 Total items in state: \(state.items.count)")
+            
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
         } catch {
+            print("❌ Decoding error: \(error)")
             state.shouldLoad = true
         }
         onStateChange?(state)
@@ -79,9 +89,15 @@ private extension ReviewsViewModel {
     typealias ReviewItem = ReviewCellConfig
 
     func makeReviewItem(_ review: Review) -> ReviewItem {
-        let reviewText = review.text.attributed(font: .text)
-        let created = review.created.attributed(font: .created, color: .created)
+        let userName = "\(review.firstName) \(review.lastName)"
+        let reviewText = review.text.attributed(font: .systemFont(ofSize: 14))
+        let created = review.created.attributed(font: .systemFont(ofSize: 12), color: .gray)
+        
+        let avatarURL = URL(string: review.avatarStringURL)
+        
         let item = ReviewItem(
+            userName: userName,
+            avatarURL: avatarURL,
             reviewText: reviewText,
             created: created,
             onTapShowMore: showMoreReview

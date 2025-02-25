@@ -35,12 +35,16 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
+        reviewsView.tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
         return reviewsView
     }
 
     func setupViewModel() {
-        viewModel.onStateChange = { [weak reviewsView] _ in
-            reviewsView?.tableView.reloadData()
+        viewModel.onStateChange = { [weak self] state in
+            print("🔄 Reloading table view with \(state.items.count) items")
+            DispatchQueue.main.async {
+                self?.reviewsView.tableView.reloadData()
+            }
         }
     }
 
