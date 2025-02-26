@@ -15,4 +15,14 @@ struct Review: Decodable {
         case text
         case created
     }
+    
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.firstName = try container.decode(String.self, forKey: .firstName)
+        self.lastName = try container.decode(String.self, forKey: .lastName)
+        self.avatarStringURL = (try? container.decode(String.self, forKey: .avatarStringURL)) ?? ""
+        self.rating = try container.decode(Int.self, forKey: .rating)
+        self.text = try container.decode(String.self, forKey: .text)
+        self.created = try container.decode(String.self, forKey: .created)
+    }
 }

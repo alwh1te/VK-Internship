@@ -42,8 +42,10 @@ private extension ReviewsViewController {
     func setupViewModel() {
         viewModel.onStateChange = { [weak self] state in
             print("🔄 Reloading table view with \(state.items.count) items")
+            guard let self = self else { return }
             DispatchQueue.main.async {
-                self?.reviewsView.tableView.reloadData()
+                self.reviewsView.tableView.reloadData()
+                self.viewModel.updateReviewsCount(self.reviewsView.reviewsCounterLabel)
             }
         }
     }

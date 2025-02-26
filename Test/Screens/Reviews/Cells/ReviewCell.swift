@@ -137,13 +137,13 @@ private extension ReviewCell {
 
     func setupCell() {
         addSubviews()
-        setupLayout()
         setupUserImageView()
         setupUserNameLabel()
         setupRatingView()
         setupReviewTextLabel()
         setupCreatedLabel()
         setupShowMoreButton()
+        setupLayout()
     }
     
     func addSubviews() {
@@ -173,7 +173,7 @@ private extension ReviewCell {
             reviewTextLabel.topAnchor.constraint(equalTo: ratingImageView.bottomAnchor, constant: 12),
             reviewTextLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            createdLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            createdLabel.leadingAnchor.constraint(equalTo: reviewTextLabel.leadingAnchor, constant: 0),
             createdLabel.topAnchor.constraint(equalTo: reviewTextLabel.bottomAnchor, constant: 8),
             createdLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             createdLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
@@ -211,6 +211,7 @@ private extension ReviewCell {
     func setupShowMoreButton() {
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
+        showMoreButton.translatesAutoresizingMaskIntoConstraints = false
     }
 
 }

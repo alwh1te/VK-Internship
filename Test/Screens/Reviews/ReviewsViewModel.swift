@@ -41,6 +41,27 @@ extension ReviewsViewModel {
         reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
     }
 
+    /// Метод обновления счетчика отзывов.
+    func updateReviewsCount(_ label: UILabel) {
+        let count = state.items.count
+        label.text = "\(count) \(pluralizeReviews(count))"
+    }
+    
+    private func pluralizeReviews(_ count: Int) -> String {
+        let cases = ["отзыв", "отзыва", "отзывов"]
+        let remainder100 = count % 100
+        let remainder10 = count % 10
+        
+        if remainder100 >= 11 && remainder100 <= 19 {
+            return cases[2]
+        }
+        
+        switch remainder10 {
+            case 1: return cases[0]
+            case 2...4: return cases[1]
+            default: return cases[2]
+        }
+    }
 }
 
 // MARK: - Private
