@@ -294,12 +294,13 @@ private extension ReviewCell {
     }
     
     func updateCreatedLabelConstraints() {      
-        photoCollectionViewTopToRatingConstraint.isActive = false
-        reviewTextLabelTopToPhotoColletionViewConstraint.isActive = false
-        reviewTextLabelTopToRatingConstraint.isActive = false
-        
-        createdLabelTopToShowMoreConstraint.isActive = false
-        createdLabelTopToReviewTextConstraint.isActive = false
+        NSLayoutConstraint.deactivate([
+            photoCollectionViewTopToRatingConstraint,
+            reviewTextLabelTopToPhotoColletionViewConstraint,
+            reviewTextLabelTopToRatingConstraint,
+            createdLabelTopToShowMoreConstraint,
+            createdLabelTopToReviewTextConstraint
+        ])
         
         if !photoCollectionView.isHidden {
             photoCollectionViewTopToRatingConstraint.isActive = true
@@ -313,6 +314,8 @@ private extension ReviewCell {
         } else {
             createdLabelTopToReviewTextConstraint.isActive = true
         }
+        
+        setNeedsLayout()
     }
 
 }
