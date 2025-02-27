@@ -219,8 +219,8 @@ final class PhotoPageViewController: UIViewController {
         
         cancellable = imageProvider.loadImage(from: url)
             .sink { [weak self] image in
-                self?.activityIndicator.stopAnimating()
                 self?.imageView.image = image
+                self?.activityIndicator.stopAnimating()
             }
     }
 }

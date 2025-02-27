@@ -130,13 +130,14 @@ private extension ReviewsViewModel {
             created: created,
             photoURLs: photoURLs,
             onTapPhoto: { [weak self] uuid, index in
-                guard let self = self,
-                      let reviewItem = self.state.items.first(where: { ($0 as? ReviewItem)?.id == uuid }) as? ReviewItem else {
-                    return
+                guard let self = self else { return }
+                if let reviewItem = self.state.items.first(where: { ($0 as? ReviewItem)?.id == uuid }) as? ReviewItem {
+                    self.delegate?.reviewsViewModel(self, didTapPhotoAt: index, in: reviewItem)
                 }
-                self.delegate?.reviewsViewModel(self, didTapPhotoAt: index, in: reviewItem)
             },
-            onTapShowMore: showMoreReview,
+            onTapShowMore: { [weak self] uuid in
+                self?.showMoreReview(with: uuid)
+            },
             ratingRender: ratingRenderer,
             imageProvider: imageProvider
         )

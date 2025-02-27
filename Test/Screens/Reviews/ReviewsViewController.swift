@@ -38,6 +38,7 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
+        reviewsView.tableView.estimatedRowHeight = 200
         reviewsView.tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
         return reviewsView
     }

@@ -285,6 +285,9 @@ private extension ReviewCell {
     }
     
     func updateCreatedLabelConstraints() {      
+        let shouldActivatePhotoConstraints = !photoCollectionView.isHidden
+        let shouldActivateShowMoreConstraints = !showMoreButton.isHidden
+        
         NSLayoutConstraint.deactivate([
             photoCollectionViewTopToRatingConstraint,
             reviewTextLabelTopToPhotoColletionViewConstraint,
@@ -293,14 +296,16 @@ private extension ReviewCell {
             createdLabelTopToReviewTextConstraint
         ])
         
-        if !photoCollectionView.isHidden {
-            photoCollectionViewTopToRatingConstraint.isActive = true
-            reviewTextLabelTopToPhotoColletionViewConstraint.isActive = true
+        if shouldActivatePhotoConstraints {
+            NSLayoutConstraint.activate([
+                photoCollectionViewTopToRatingConstraint,
+                reviewTextLabelTopToPhotoColletionViewConstraint
+            ])
         } else {
             reviewTextLabelTopToRatingConstraint.isActive = true
         }
         
-        if !showMoreButton.isHidden {
+        if shouldActivateShowMoreConstraints {
             createdLabelTopToShowMoreConstraint.isActive = true
         } else {
             createdLabelTopToReviewTextConstraint.isActive = true
@@ -322,8 +327,8 @@ extension ReviewCell: UICollectionViewDataSource, UICollectionViewDelegate {
         if let config = config, indexPath.item < config.photoURLs.count {
             let url = config.photoURLs[indexPath.item]
             cell.cancellable = config.imageProvider.loadImage(from: url)
-                .sink { image in
-                    cell.imageView.image = image ?? UIImage(systemName: "photo")
+                .sink { [weak cell] image in
+                    cell?.imageView.image = image ?? UIImage(systemName: "photo")
                 }
         }
         
