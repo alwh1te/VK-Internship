@@ -13,12 +13,6 @@ final class ReviewsView: UIView {
         super.init(frame: frame)
         setupView()
     }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        tableView.frame = bounds.inset(by: safeAreaInsets)
-    }
-
 }
 
 // MARK: - Private
@@ -52,6 +46,15 @@ private extension ReviewsView {
 
     func setupTableView() {
         addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
+        ])
+        
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)

@@ -50,6 +50,27 @@ extension ReviewCellConfig: TableCellConfig {
         cell.ratingImageView.image = ratingRender.ratingImage(rating)
         cell.config = self
         
+        if maxLines > 0 {
+            cell.reviewTextLabel.numberOfLines = 0
+            let fullSize = cell.reviewTextLabel.sizeThatFits(
+                CGSize(width: cell.contentView.bounds.width - 24, height: CGFloat.greatestFiniteMagnitude)
+            )
+            
+            cell.reviewTextLabel.numberOfLines = maxLines
+            let truncatedSize = cell.reviewTextLabel.sizeThatFits(
+                CGSize(width: cell.contentView.bounds.width - 24, height: CGFloat.greatestFiniteMagnitude)
+            )
+            
+            let needsShowMoreButton = fullSize.height > truncatedSize.height
+            cell.showMoreButton.isHidden = !needsShowMoreButton
+        } else {
+            cell.showMoreButton.isHidden = true
+        }
+        
+        cell.showMoreButton.removeTarget(nil, action: nil, for: .allEvents)
+        cell.showMoreButton.addAction(UIAction { [id, onTapShowMore] _ in
+            onTapShowMore(id)
+        }, for: .touchUpInside)
 
         if let url = avatarURL {
             cell.avatarCancellable = imageProvider.loadImage(from: url)
@@ -59,21 +80,13 @@ extension ReviewCellConfig: TableCellConfig {
         } else {
             cell.userImageView.image = UIImage(named: "default_avatar")
         }
+        cell.updateCreatedLabelConstraints(showMoreButtonVisible: !cell.showMoreButton.isHidden)
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
     /// Вызывается из `heightForRowAt:` делегата таблицы.
     func height(with size: CGSize) -> CGFloat {
-        let minHeight: CGFloat = 88 // 16 + 40 + 16 + 16
-                
-        // Расчет высоты для текста отзыва
-        let textWidth = size.width - 32 // отступы слева и справа
-        let textHeight = reviewText.boundingRect(width: textWidth).height
-        
-        // Расчет высоты для даты
-        let createdHeight = created.boundingRect(width: textWidth).height
-        
-        return minHeight + textHeight + createdHeight + 20 // 20 для дополнительных отступов
+        return UITableView.automaticDimension
     }
 
 }
@@ -102,6 +115,9 @@ final class ReviewCell: UITableViewCell {
     fileprivate let reviewTextLabel = UILabel()
     fileprivate let createdLabel = UILabel()
     fileprivate let showMoreButton = UIButton()
+    
+    private var createdLabelTopToShowMoreConstraint: NSLayoutConstraint!
+    private var createdLabelTopToReviewTextConstraint: NSLayoutConstraint!
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -152,32 +168,45 @@ private extension ReviewCell {
         contentView.addSubview(ratingImageView)
         contentView.addSubview(reviewTextLabel)
         contentView.addSubview(createdLabel)
+        contentView.addSubview(showMoreButton)
     }
     
     func setupLayout() {
+        let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
+        
+        createdLabelTopToShowMoreConstraint = createdLabel.topAnchor.constraint(
+            equalTo: showMoreButton.bottomAnchor, constant: 8)
+        
+        createdLabelTopToReviewTextConstraint = createdLabel.topAnchor.constraint(
+            equalTo: reviewTextLabel.bottomAnchor, constant: 8)
+        
         NSLayoutConstraint.activate([
-            userImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            userImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            userImageView.widthAnchor.constraint(equalToConstant: ReviewCellLayout.avatarSize.width),
-            userImageView.heightAnchor.constraint(equalToConstant: ReviewCellLayout.avatarSize.height),
+            userImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: insets.top),
+            userImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: insets.left),
+            userImageView.widthAnchor.constraint(equalToConstant: Layout.avatarSize.width),
+            userImageView.heightAnchor.constraint(equalToConstant: Layout.avatarSize.height),
             
-            userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 12),
-            userNameLabel.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
-            userNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            userNameLabel.topAnchor.constraint(equalTo: userImageView.topAnchor),
+            userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 8),
+            userNameLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -insets.right),
             
-            ratingImageView.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor, constant: 0),
             ratingImageView.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 4),
-            ratingImageView.trailingAnchor.constraint(equalTo: userNameLabel.trailingAnchor, constant: 0),
+            ratingImageView.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
             
-            reviewTextLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor, constant: 0),
-            reviewTextLabel.topAnchor.constraint(equalTo: ratingImageView.bottomAnchor, constant: 12),
-            reviewTextLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            reviewTextLabel.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 12),
+            reviewTextLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
+            reviewTextLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
             
-            createdLabel.leadingAnchor.constraint(equalTo: reviewTextLabel.leadingAnchor, constant: 0),
-            createdLabel.topAnchor.constraint(equalTo: reviewTextLabel.bottomAnchor, constant: 8),
-            createdLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            createdLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+            showMoreButton.topAnchor.constraint(equalTo: reviewTextLabel.bottomAnchor, constant: 4),
+            showMoreButton.leadingAnchor.constraint(equalTo: reviewTextLabel.leadingAnchor),
+            
+            createdLabel.topAnchor.constraint(equalTo: showMoreButton.bottomAnchor, constant: 8),
+            createdLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
+            createdLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
+            createdLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -insets.bottom)
         ])
+        
+        updateCreatedLabelConstraints(showMoreButtonVisible: !showMoreButton.isHidden)
     }
     
     func setupUserImageView() {
@@ -212,6 +241,17 @@ private extension ReviewCell {
         showMoreButton.contentVerticalAlignment = .fill
         showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
         showMoreButton.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func updateCreatedLabelConstraints(showMoreButtonVisible: Bool) {
+        createdLabelTopToShowMoreConstraint.isActive = false
+        createdLabelTopToReviewTextConstraint.isActive = false
+        
+        if showMoreButtonVisible {
+            createdLabelTopToShowMoreConstraint.isActive = true
+        } else {
+            createdLabelTopToReviewTextConstraint.isActive = true
+        }
     }
 
 }
