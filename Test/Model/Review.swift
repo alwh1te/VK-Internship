@@ -6,7 +6,7 @@ struct Review: Decodable {
     let rating: Int
     let text: String
     let created: String
-    let photoURLs: [String]
+    var photoURLs: [String]
 
     enum CodingKeys: String, CodingKey {
         case firstName = "first_name"
@@ -27,5 +27,8 @@ struct Review: Decodable {
         self.text = try container.decode(String.self, forKey: .text)
         self.created = try container.decode(String.self, forKey: .created)
         self.photoURLs = (try? container.decode([String].self, forKey: .photoURLs)) ?? []
+        if photoURLs.count > 5 {
+            self.photoURLs = Array(photoURLs[..<5])
+        }
     }
 }

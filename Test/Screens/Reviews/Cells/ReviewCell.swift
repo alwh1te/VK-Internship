@@ -163,15 +163,6 @@ final class ReviewCell: UITableViewCell {
         
         photoCollectionView.isHidden = true
     }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        guard let layout = config?.layout else { return }
-        reviewTextLabel.frame = layout.reviewTextLabelFrame
-        createdLabel.frame = layout.createdLabelFrame
-        showMoreButton.frame = layout.showMoreButtonFrame
-    }
-
 }
 
 // MARK: - Private
@@ -191,6 +182,7 @@ private extension ReviewCell {
     }
     
     func addSubviews() {
+        contentView.addSubview(photoCollectionView)
         contentView.addSubview(userImageView)
         contentView.addSubview(userNameLabel)
         contentView.addSubview(ratingImageView)
@@ -256,7 +248,6 @@ private extension ReviewCell {
         photoCollectionView.dataSource = self
         photoCollectionView.isHidden = true
         photoCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(photoCollectionView)
     }
     
     func setupUserImageView() {
