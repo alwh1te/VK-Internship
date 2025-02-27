@@ -200,7 +200,6 @@ private extension ReviewCell {
             showMoreButton.topAnchor.constraint(equalTo: reviewTextLabel.bottomAnchor, constant: 4),
             showMoreButton.leadingAnchor.constraint(equalTo: reviewTextLabel.leadingAnchor),
             
-            createdLabel.topAnchor.constraint(equalTo: showMoreButton.bottomAnchor, constant: 8),
             createdLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
             createdLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
             createdLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -insets.bottom)
