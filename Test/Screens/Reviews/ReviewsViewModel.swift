@@ -5,6 +5,8 @@ final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
     var onStateChange: ((State) -> Void)?
+    
+    weak var delegate: ReviewsViewModelDelegate?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -17,7 +19,7 @@ final class ReviewsViewModel: NSObject {
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
         ratingRenderer: RatingRenderer = RatingRenderer(),
         decoder: JSONDecoder = JSONDecoder(),
-        imageProvider: ImageProvider = ImageProvider()
+        imageProvider: ImageProvider = ImageProvider.shared
     ) {
         self.state = state
         self.reviewsProvider = reviewsProvider
@@ -118,20 +120,28 @@ private extension ReviewsViewModel {
         let created = review.created.attributed(font: .systemFont(ofSize: 12), color: .gray)
         
         let avatarURL = URL(string: review.avatarStringURL)
-        
+        let photoURLs = review.photoURLs.compactMap { URL(string: $0) }
+
         let item = ReviewItem(
             userName: userName,
             avatarURL: avatarURL,
             rating: review.rating,
             reviewText: reviewText,
             created: created,
+            photoURLs: photoURLs,
+            onTapPhoto: { [weak self] uuid, index in
+                guard let self = self,
+                      let reviewItem = self.state.items.first(where: { ($0 as? ReviewItem)?.id == uuid }) as? ReviewItem else {
+                    return
+                }
+                self.delegate?.reviewsViewModel(self, didTapPhotoAt: index, in: reviewItem)
+            },
             onTapShowMore: showMoreReview,
             ratingRender: ratingRenderer,
             imageProvider: imageProvider
         )
         return item
     }
-
 }
 
 // MARK: - UITableViewDataSource
@@ -154,6 +164,10 @@ extension ReviewsViewModel: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension ReviewsViewModel: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension

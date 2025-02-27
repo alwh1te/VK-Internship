@@ -6,7 +6,8 @@ struct Review: Decodable {
     let rating: Int
     let text: String
     let created: String
-    
+    let photoURLs: [String]
+
     enum CodingKeys: String, CodingKey {
         case firstName = "first_name"
         case lastName = "last_name"
@@ -14,6 +15,7 @@ struct Review: Decodable {
         case rating
         case text
         case created
+        case photoURLs = "photo_urls"
     }
     
     init(from decoder: any Decoder) throws {
@@ -24,5 +26,6 @@ struct Review: Decodable {
         self.rating = try container.decode(Int.self, forKey: .rating)
         self.text = try container.decode(String.self, forKey: .text)
         self.created = try container.decode(String.self, forKey: .created)
+        self.photoURLs = (try? container.decode([String].self, forKey: .photoURLs)) ?? []
     }
 }

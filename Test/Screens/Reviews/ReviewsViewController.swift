@@ -40,6 +40,7 @@ private extension ReviewsViewController {
     }
 
     func setupViewModel() {
+        viewModel.delegate = self
         viewModel.onStateChange = { [weak self] state in
             print("🔄 Reloading table view with \(state.items.count) items")
             guard let self = self else { return }
@@ -49,5 +50,21 @@ private extension ReviewsViewController {
             }
         }
     }
+    
+    func onTapReview(with vc: UIViewController) {
+        present(vc, animated: true)
+    }
+}
 
+extension ReviewsViewController: ReviewsViewModelDelegate {
+    func reviewsViewModel(_ viewModel: ReviewsViewModel, didTapPhotoAt photoIndex: Int, in review: ReviewCellConfig) {
+        let galleryVC = PhotoGalleryViewController(
+            photoURLs: review.photoURLs,
+            reviewText: review.reviewText,
+            imageProvider: review.imageProvider,
+            initialPhotoIndex: photoIndex
+        )
+        
+        onTapReview(with: galleryVC)
+    }
 }
