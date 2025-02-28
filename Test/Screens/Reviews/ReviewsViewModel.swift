@@ -79,14 +79,19 @@ private extension ReviewsViewModel {
             let reviews = try decoder.decode(Reviews.self, from: data)
             print("✅ Decoded reviews count: \(reviews.items.count)")
             
-            let newItems = reviews.items.map(makeReviewItem)
+            let newItems = reviews.items.compactMap(makeReviewItem)
             print("🔄 Created items count: \(newItems.count)")
+            
+            if newItems.count < reviews.count {
+                state.offset += newItems.count
+                state.shouldLoad = state.offset < newItems.count
+            } else {
+                state.offset += state.limit
+                state.shouldLoad = state.offset < reviews.count
+            }
             
             state.items += newItems
             print("📊 Total items in state: \(state.items.count)")
-            
-            state.offset += state.limit
-            state.shouldLoad = state.offset < reviews.count
         } catch {
             print("❌ Decoding error: \(error)")
             state.shouldLoad = true
@@ -114,7 +119,8 @@ private extension ReviewsViewModel {
 
     typealias ReviewItem = ReviewCellConfig
 
-    func makeReviewItem(_ review: Review) -> ReviewItem {
+    func makeReviewItem(_ review: Review) -> ReviewItem? {
+        if !review.isValid { return nil }
         let userName = "\(review.firstName) \(review.lastName)"
         let reviewText = review.text.attributed(font: .systemFont(ofSize: 14))
         let created = review.created.attributed(font: .systemFont(ofSize: 12), color: .gray)

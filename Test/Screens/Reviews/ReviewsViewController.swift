@@ -4,8 +4,6 @@ final class ReviewsViewController: UIViewController {
 
     private lazy var reviewsView = makeReviewsView()
     private let viewModel: ReviewsViewModel
-
-    private var refreshControl = UIRefreshControl()
     
     init(viewModel: ReviewsViewModel) {
         self.viewModel = viewModel
@@ -24,7 +22,6 @@ final class ReviewsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewModel()
-//        setupRefreshControl()
         viewModel.getReviews()
     }
 
