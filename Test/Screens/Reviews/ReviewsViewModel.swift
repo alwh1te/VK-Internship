@@ -5,6 +5,8 @@ final class ReviewsViewModel: NSObject {
 
     /// Замыкание, вызываемое при изменении `state`.
     var onStateChange: ((State) -> Void)?
+    
+    weak var delegate: ReviewsViewModelDelegate?
 
     private var state: State
     private let reviewsProvider: ReviewsProvider
@@ -17,7 +19,7 @@ final class ReviewsViewModel: NSObject {
         reviewsProvider: ReviewsProvider = ReviewsProvider(),
         ratingRenderer: RatingRenderer = RatingRenderer(),
         decoder: JSONDecoder = JSONDecoder(),
-        imageProvider: ImageProvider = ImageProvider()
+        imageProvider: ImageProvider = ImageProvider.shared
     ) {
         self.state = state
         self.reviewsProvider = reviewsProvider
@@ -77,14 +79,19 @@ private extension ReviewsViewModel {
             let reviews = try decoder.decode(Reviews.self, from: data)
             print("✅ Decoded reviews count: \(reviews.items.count)")
             
-            let newItems = reviews.items.map(makeReviewItem)
+            let newItems = reviews.items.compactMap(makeReviewItem)
             print("🔄 Created items count: \(newItems.count)")
+            
+            if newItems.count < reviews.count {
+                state.offset += newItems.count
+                state.shouldLoad = state.offset < newItems.count
+            } else {
+                state.offset += state.limit
+                state.shouldLoad = state.offset < reviews.count
+            }
             
             state.items += newItems
             print("📊 Total items in state: \(state.items.count)")
-            
-            state.offset += state.limit
-            state.shouldLoad = state.offset < reviews.count
         } catch {
             print("❌ Decoding error: \(error)")
             state.shouldLoad = true
@@ -112,26 +119,36 @@ private extension ReviewsViewModel {
 
     typealias ReviewItem = ReviewCellConfig
 
-    func makeReviewItem(_ review: Review) -> ReviewItem {
+    func makeReviewItem(_ review: Review) -> ReviewItem? {
+        if !review.isValid { return nil }
         let userName = "\(review.firstName) \(review.lastName)"
         let reviewText = review.text.attributed(font: .systemFont(ofSize: 14))
         let created = review.created.attributed(font: .systemFont(ofSize: 12), color: .gray)
         
         let avatarURL = URL(string: review.avatarStringURL)
-        
+        let photoURLs = review.photoURLs.compactMap { URL(string: $0) }
+
         let item = ReviewItem(
             userName: userName,
             avatarURL: avatarURL,
             rating: review.rating,
             reviewText: reviewText,
             created: created,
-            onTapShowMore: showMoreReview,
+            photoURLs: photoURLs,
+            onTapPhoto: { [weak self] uuid, index in
+                guard let self = self else { return }
+                if let reviewItem = self.state.items.first(where: { ($0 as? ReviewItem)?.id == uuid }) as? ReviewItem {
+                    self.delegate?.reviewsViewModel(self, didTapPhotoAt: index, in: reviewItem)
+                }
+            },
+            onTapShowMore: { [weak self] uuid in
+                self?.showMoreReview(with: uuid)
+            },
             ratingRender: ratingRenderer,
             imageProvider: imageProvider
         )
         return item
     }
-
 }
 
 // MARK: - UITableViewDataSource
@@ -154,6 +171,10 @@ extension ReviewsViewModel: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension ReviewsViewModel: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension

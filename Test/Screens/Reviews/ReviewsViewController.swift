@@ -4,7 +4,7 @@ final class ReviewsViewController: UIViewController {
 
     private lazy var reviewsView = makeReviewsView()
     private let viewModel: ReviewsViewModel
-
+    
     init(viewModel: ReviewsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -35,11 +35,13 @@ private extension ReviewsViewController {
         let reviewsView = ReviewsView()
         reviewsView.tableView.delegate = viewModel
         reviewsView.tableView.dataSource = viewModel
+        reviewsView.tableView.estimatedRowHeight = 200
         reviewsView.tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
         return reviewsView
     }
 
     func setupViewModel() {
+        viewModel.delegate = self
         viewModel.onStateChange = { [weak self] state in
             print("🔄 Reloading table view with \(state.items.count) items")
             guard let self = self else { return }
@@ -49,5 +51,21 @@ private extension ReviewsViewController {
             }
         }
     }
+    
+    func onTapReview(with vc: UIViewController) {
+        present(vc, animated: true)
+    }
+}
 
+extension ReviewsViewController: ReviewsViewModelDelegate {
+    func reviewsViewModel(_ viewModel: ReviewsViewModel, didTapPhotoAt photoIndex: Int, in review: ReviewCellConfig) {
+        let galleryVC = PhotoGalleryViewController(
+            photoURLs: review.photoURLs,
+            reviewText: review.reviewText,
+            imageProvider: review.imageProvider,
+            initialPhotoIndex: photoIndex
+        )
+        
+        onTapReview(with: galleryVC)
+    }
 }

@@ -29,17 +29,18 @@ extension ReviewsProvider {
             print("❌ Failed to find JSON file")
             return completion(.failure(.badURL))
         }
+        DispatchQueue.global().async {
+            // Симулируем сетевой запрос - не менять
+            usleep(.random(in: 100_000...1_000_000))
 
-        // Симулируем сетевой запрос - не менять
-        usleep(.random(in: 100_000...1_000_000))
-
-        do {
-            let data = try Data(contentsOf: url)
-            print("📄 Successfully loaded JSON data: \(String(data: data, encoding: .utf8) ?? "nil")")
-            completion(.success(data))
-        } catch {
-            print("❌ Failed to load JSON data: \(error)")
-            completion(.failure(.badData(error)))
+            do {
+                let data = try Data(contentsOf: url)
+                print("📄 Successfully loaded JSON data: \(String(data: data, encoding: .utf8) ?? "nil")")
+                completion(.success(data))
+            } catch {
+                print("❌ Failed to load JSON data: \(error)")
+                completion(.failure(.badData(error)))
+            }
         }
     }
 
