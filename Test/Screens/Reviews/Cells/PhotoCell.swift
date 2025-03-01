@@ -34,5 +34,6 @@ final class PhotoCell: UICollectionViewCell {
         super.prepareForReuse()
         cancellable?.cancel()
         cancellable = nil
+        imageView.image = nil
     }
 }

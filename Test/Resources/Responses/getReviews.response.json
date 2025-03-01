@@ -1,33 +1,41 @@
 {
-    "count": 127,
+    "count": 23,
     "items": [
         {
             "first_name": "Иван",
             "last_name": "Петров",
             "rating": 5,
             "text": "Кроссовки хорошие. Удобные. Как по мне сшиты.",
-            "created": "1 час назад"
+            "created": "1 час назад",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Екатерина",
             "last_name": "Иванова",
             "rating": 3,
             "text": "Скользские ужасно.",
-            "created": "12 минут назад"
+            "created": "12 минут назад",
+            "avatar_url": "https://catscornervet.com/wp-content/uploads/2016/04/kitty-1.png",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Евгения",
             "last_name": "Петрова",
             "rating": 4,
             "text": "Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
-            "created": "35 минут назад"
+            "created": "35 минут назад",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Илья",
             "last_name": "Петров",
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
-            "created": "минуту назад"
+            "created": "минуту назад",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Никита",
@@ -78,7 +86,9 @@
             "last_name": "Петров",
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
-            "created": "минуту назад"
+            "created": "минуту назад",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Никита",
@@ -115,7 +125,9 @@
             "last_name": "Иванова",
             "rating": 3,
             "text": "Скользские ужасно.",
-            "created": "12 минут назад"
+            "created": "12 минут назад",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Евгения",
@@ -129,7 +141,9 @@
             "last_name": "Петров",
             "rating": 2,
             "text": "Понравилось отношение - несмотря на то, что заказ был выполнен не идеально, продавец был очень любезен и шёл... Прошла по снегу 30 метров, 5 раз упала. Спасибо мужу, поддерживал. Возврат, к сожалению.",
-            "created": "минуту назад"
+            "created": "минуту назад",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
         {
             "first_name": "Никита",
@@ -147,10 +161,30 @@
         },
         {
             "first_name": "Николай",
-            "last_name": "Петров",
+            "last_name": "Ведерников",
             "rating": 2,
             "text": "",
-            "created": "вчера в 12:39"
+            "created": "вчера в 12:39",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
+        },
+        {
+            "first_name": "Геогрий",
+            "last_name": "Корнеев",
+            "rating": 2,
+            "text": "",
+            "created": "вчера в 12:39",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
+        },
+        {
+            "first_name": "Дмитрий",
+            "last_name": "Ивченко",
+            "rating": 2,
+            "text": "",
+            "created": "вчера в 12:39",
+            "avatar_url": "https://images.pexels.com/photos/617278/pexels-photo-617278.jpeg?auto=compress&cs=tinysrgb&h=350",
+            "photo_urls": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg", "https://www.petmd.com/sites/default/files/petmd-cat-happy-13.jpg"]
         },
     ]
 }

@@ -1,5 +1,5 @@
 /// Модель отзыва.
-struct Review: Decodable {
+struct Review: Codable {
     var firstName: String
     var lastName: String
     var avatarStringURL: String

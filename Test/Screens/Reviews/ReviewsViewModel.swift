@@ -84,22 +84,20 @@ private extension ReviewsViewModel {
             let data = try result.get()
             
             let reviews = try decoder.decode(Reviews.self, from: data)
-
+            
             let newItems = reviews.items.compactMap(makeReviewItem)
             
-            if newItems.count < reviews.count {
-                state.offset += newItems.count
-                state.shouldLoad = state.offset < newItems.count
-            } else {
-                state.offset += state.limit
-                state.shouldLoad = state.offset < reviews.count
-            }
+            state.offset += state.limit
+            
+            state.shouldLoad = state.offset < reviews.count
             
             state.items += newItems
+            
         } catch {
             print("❌ Decoding error: \(error)")
             state.shouldLoad = true
         }
+        
         onStateChange?(state)
     }
 

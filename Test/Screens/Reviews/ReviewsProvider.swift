@@ -34,13 +34,50 @@ extension ReviewsProvider {
             usleep(.random(in: 100_000...1_000_000))
 
             do {
-                let data = try Data(contentsOf: url)
-                completion(.success(data))
+                let allData = try Data(contentsOf: url)
+                
+                if offset == 0 {
+                    do {
+                        let decoder = JSONDecoder()
+                        let allReviews = try decoder.decode(Reviews.self, from: allData)
+                        
+                        let pageLimit = min(20, allReviews.items.count)
+                        let pageItems = Array(allReviews.items[0..<pageLimit])
+                        let pageReviews = Reviews(items: pageItems, count: allReviews.count)
+                        
+                        let pageData = try JSONEncoder().encode(pageReviews)
+                        completion(.success(pageData))
+                    } catch {
+                        completion(.success(allData))
+                    }
+                    return
+                }
+                
+                do {
+                    let decoder = JSONDecoder()
+                    let allReviews = try decoder.decode(Reviews.self, from: allData)
+                    
+                    if offset >= allReviews.items.count {
+                        let emptyReviews = Reviews(items: [], count: allReviews.count)
+                        let emptyData = try JSONEncoder().encode(emptyReviews)
+                        completion(.success(emptyData))
+                        return
+                    }
+                    
+                    let startIndex = offset
+                    let endIndex = min(offset + 20, allReviews.items.count)
+                    
+                    let pageItems = Array(allReviews.items[startIndex..<endIndex])
+                    let pageReviews = Reviews(items: pageItems, count: allReviews.count)
+                    
+                    let pageData = try JSONEncoder().encode(pageReviews)
+                    completion(.success(pageData))
+                } catch {
+                    completion(.failure(.badData(error)))
+                }
             } catch {
-                print("❌ Failed to load JSON data: \(error)")
                 completion(.failure(.badData(error)))
             }
         }
     }
-
 }
