@@ -42,6 +42,14 @@ extension ReviewsViewModel {
         state.shouldLoad = false
         reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
     }
+    
+    func refreshReviews() {
+        state.items = []
+        state.offset = 0
+        state.shouldLoad = true
+        onStateChange?(state)
+        getReviews()
+    }
 
     /// Метод обновления счетчика отзывов.
     func updateReviewsCount(_ label: UILabel) {
@@ -74,13 +82,10 @@ private extension ReviewsViewModel {
     func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
         do {
             let data = try result.get()
-            print("📦 Got data: \(String(data: data, encoding: .utf8) ?? "nil")")
             
             let reviews = try decoder.decode(Reviews.self, from: data)
-            print("✅ Decoded reviews count: \(reviews.items.count)")
-            
+
             let newItems = reviews.items.compactMap(makeReviewItem)
-            print("🔄 Created items count: \(newItems.count)")
             
             if newItems.count < reviews.count {
                 state.offset += newItems.count
@@ -91,7 +96,6 @@ private extension ReviewsViewModel {
             }
             
             state.items += newItems
-            print("📊 Total items in state: \(state.items.count)")
         } catch {
             print("❌ Decoding error: \(error)")
             state.shouldLoad = true

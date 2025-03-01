@@ -4,6 +4,7 @@ final class ReviewsView: UIView {
 
     let tableView = UITableView()
     let reviewsCounterLabel = UILabel()
+    let refreshControl = UIRefreshControl()
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -23,6 +24,7 @@ private extension ReviewsView {
         backgroundColor = .systemBackground
         setupTableView()
         setupReviewsCounterLabel()
+        setupRefreshControl()
     }
     
     func setupReviewsCounterLabel() {
@@ -59,5 +61,8 @@ private extension ReviewsView {
         tableView.allowsSelection = true
         tableView.register(ReviewCell.self, forCellReuseIdentifier: ReviewCellConfig.reuseId)
     }
-
+    
+    func setupRefreshControl() {
+        tableView.refreshControl = refreshControl
+    }
 }
