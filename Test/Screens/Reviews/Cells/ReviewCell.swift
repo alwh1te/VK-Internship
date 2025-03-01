@@ -93,7 +93,7 @@ extension ReviewCellConfig: TableCellConfig {
         }
 
 
-        cell.updateCreatedLabelConstraints()
+        cell.updateReviewCellConstraints()
     }
 
     /// Метод, возвращаюший высоту ячейки с данным ограничением по размеру.
@@ -143,6 +143,7 @@ final class ReviewCell: UITableViewCell {
     private var photoCollectionViewTopToRatingConstraint: NSLayoutConstraint!
     private var reviewTextLabelTopToPhotoColletionViewConstraint: NSLayoutConstraint!
     private var reviewTextLabelTopToRatingConstraint: NSLayoutConstraint!
+    private var photoCollectionViewHeightConstraint: NSLayoutConstraint!
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -208,6 +209,9 @@ private extension ReviewCell {
         
         createdLabelTopToReviewTextConstraint = createdLabel.topAnchor.constraint(
             equalTo: reviewTextLabel.bottomAnchor, constant: 8)
+        
+        photoCollectionViewHeightConstraint = photoCollectionView.heightAnchor.constraint(equalToConstant: 80)
+        photoCollectionViewHeightConstraint.priority = UILayoutPriority(999)
 
         NSLayoutConstraint.activate([
             userImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: insets.top),
@@ -230,18 +234,17 @@ private extension ReviewCell {
             
             photoCollectionView.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
             photoCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
-            photoCollectionView.heightAnchor.constraint(equalToConstant: 80),
             
             createdLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
             createdLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
             createdLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -insets.bottom)
         ])
         
-        updateCreatedLabelConstraints()
+        updateReviewCellConstraints()
     }
     
     func setupPhotoCollectionView() {
-        photoCollectionView.register(PhotoCell.self, forCellWithReuseIdentifier: "\(PhotoCell.self)")
+        photoCollectionView.register(PhotoCell.self, forCellWithReuseIdentifier: String(describing: PhotoCell.self))
         photoCollectionView.backgroundColor = .clear
         photoCollectionView.showsHorizontalScrollIndicator = false
         photoCollectionView.delegate = self
@@ -284,12 +287,13 @@ private extension ReviewCell {
         showMoreButton.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    func updateCreatedLabelConstraints() {      
+    func updateReviewCellConstraints() {      
         let shouldActivatePhotoConstraints = !photoCollectionView.isHidden
         let shouldActivateShowMoreConstraints = !showMoreButton.isHidden
         
         NSLayoutConstraint.deactivate([
             photoCollectionViewTopToRatingConstraint,
+            photoCollectionViewHeightConstraint,
             reviewTextLabelTopToPhotoColletionViewConstraint,
             reviewTextLabelTopToRatingConstraint,
             createdLabelTopToShowMoreConstraint,
@@ -299,6 +303,7 @@ private extension ReviewCell {
         if shouldActivatePhotoConstraints {
             NSLayoutConstraint.activate([
                 photoCollectionViewTopToRatingConstraint,
+                photoCollectionViewHeightConstraint,
                 reviewTextLabelTopToPhotoColletionViewConstraint
             ])
         } else {
